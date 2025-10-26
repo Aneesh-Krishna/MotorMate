@@ -1,0 +1,53 @@
+/* Topbar.css */
+.topbar {
+    background-color: #1a202c; /* A dark background */
+    color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  .topbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .topbar-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .topbar-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem; /* Spacing between links */
+    align-items: center;
+  }
+  
+  .topbar-links a {
+    text-decoration: none;
+    color: #cbd5e0; /* Lighter text color */
+    transition: color 0.3s ease;
+  }
+  
+  .topbar-links a:hover {
+    color: white;
+  }
+  
+  .logout-button {
+    background: none;
+    border: none;
+    color: #cbd5e0;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .logout-button:hover {
+    color: white;
+  }
+  
