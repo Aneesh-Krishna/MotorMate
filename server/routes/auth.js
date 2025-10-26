@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const util = require('util');
+const signToken = util.promisify(jwt.sign);
 
 // @route   POST api/auth/register
 // @desc    Register a new user
@@ -53,9 +55,21 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    const jwToken = await signToken(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: 3600 }
+    );
+
     req.session.user = user;
 
-    res.json({ user });
+    res.json({ user, token: jwToken });
     
   } catch (err) {
     console.error(err.message);
@@ -71,7 +85,7 @@ router.post('/logout', (req, res) => {
     if (err) {
       return res.status(500).send('Server error');
     }
-    res.status(200).json({ msg: 'Logged out successfully' });
+  res.status(200).json({ msg: 'Logged out successfully' });
   });
 });
 

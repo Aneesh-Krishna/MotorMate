@@ -8,8 +8,18 @@ export const fetchVehicles = createAsyncThunk('vehicles/fetchAll', async () => {
 });
 
 export const addVehicle = createAsyncThunk('vehicles/add', async (data) => {
-  const res = await api.post('/vehicles', data);
+  const user = JSON.parse(localStorage.getItem('user'));
+  let toSendData = {
+    ...data,
+    user: user.id || '',
+  };
+  const res = await api.post('/vehicles', toSendData);
   return res.data;
+});
+
+export const updateVehicle = createAsyncThunk('vehicles/update', async (id) => {
+  const res = await api.post('/vehicles', id);
+  return res.id;
 });
 
 export const deleteVehicle = createAsyncThunk('vehicles/delete', async (id) => {

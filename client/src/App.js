@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import PrivateRoute from './components/PrivateRoute';
+import Dashboard from './pages/Dashboard';
+import VehicleForm from './features/vehicles/VehicleForm';
 import VehicleList from './features/vehicles/VehicleList';
 import ExpenseList from './features/expenses/ExpenseList';
 import { setUser } from './features/auth/authSlice';
@@ -26,7 +28,10 @@ const AppContent = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/vehicles" element={<PrivateRoute><VehicleList /></PrivateRoute>} />
+        <Route path="/vehicles/new" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
+        <Route path="/vehicles/:id/edit" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
         <Route path="/expenses" element={<PrivateRoute><ExpenseList /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
