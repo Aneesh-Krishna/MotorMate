@@ -2,6 +2,7 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import '../css/Home.css';
+import Topbar from '../components/Topbar';
 
 const Home = () => {
   const scrollToSection = (sectionId) => {
@@ -13,6 +14,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      <Topbar />
       <main className="home-main">
         {/* Hero Section */}
         <section className="hero-section">
