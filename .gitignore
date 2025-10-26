@@ -6,3 +6,6 @@ server/node_modules
 .vscode
 .git
 .vs
+package-lock.json
+package-lock.yaml
+yarn.lock
