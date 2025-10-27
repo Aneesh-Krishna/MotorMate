@@ -30,7 +30,7 @@ export default function VehicleList() {
     setDeleteConfirm(null);
   };
 
-  if (status === 'loading') {
+  if (status === 'loading' || status === 'idle') {
     return (
       <div className="vehicle-list-container">
         <div className="loading-state">

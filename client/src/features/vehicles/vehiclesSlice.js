@@ -30,16 +30,20 @@ export const deleteVehicle = createAsyncThunk('vehicles/delete', async (id) => {
 // ---- Slice ----
 const vehiclesSlice = createSlice({
   name: 'vehicles',
-  initialState: { items: [], loading: false, error: null },
+  initialState: { items: [], status: 'idle', error: null }, // 'idle' | 'loading' | 'succeeded' | 'failed'
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchVehicles.pending, (state) => { state.loading = true; })
+      .addCase(fetchVehicles.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(fetchVehicles.fulfilled, (state, action) => {
-        state.loading = false; state.items = action.payload;
+        state.status = 'succeeded';
+        state.items = action.payload;
       })
       .addCase(fetchVehicles.rejected, (state, action) => {
-        state.loading = false; state.error = action.error.message;
+        state.status = 'failed';
+        state.error = action.error.message;
       })
       .addCase(addVehicle.fulfilled, (state, action) => {
         state.items.push(action.payload);
