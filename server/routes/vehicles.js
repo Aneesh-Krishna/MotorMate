@@ -8,13 +8,21 @@ const auth = require('../middleware/auth');
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
-    const { make, model, year, vin } = req.body;
+    const { color, fuelType, insuranceExpiry, make, mileage, model, name, purchaseDate, registrationNo, year, vin, odometer } = req.body;
     const newVehicle = new Vehicle({
-      user: req.userId,
+      user: req?.body?.user,
       make,
+      mileage,
       model,
+      name,
+      purchaseDate,
+      registrationNo,
       year,
       vin,
+      color,
+      fuelType,
+      insuranceExpiry,
+      odometer,
     });
     const vehicle = await newVehicle.save();
     res.json(vehicle);
@@ -24,12 +32,12 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// @route   GET api/vehicles
+// @route   GET api/vehicles/all
 // @desc    Get all user vehicles
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.post('/all', auth, async (req, res) => {
   try {
-    const vehicles = await Vehicle.find({ user: req.userId });
+    const vehicles = await Vehicle.find({ user: req?.body?.userId });
     res.json(vehicles);
   } catch (err) {
     console.error(err.message);
@@ -63,11 +71,19 @@ router.get('/:id', auth, async (req, res) => {
 // @route   PUT api/vehicles/:id
 // @desc    Update a vehicle
 // @access  Private
-router.put('/:id', auth, async (req, res) => {
-  const { make, model, year, vin } = req.body;
+router.post('/:id', auth, async (req, res) => {
+  const { color, fuelType, insuranceExpiry, make, mileage, model, name, purchaseDate, registrationNo, year, vin, odometer } = req.body;
 
   // Build vehicle object
   const vehicleFields = {};
+  if (color) vehicleFields.color = color;
+  if (fuelType) vehicleFields.fuelType = fuelType;
+  if (insuranceExpiry) vehicleFields.insuranceExpiry = insuranceExpiry;
+  if (mileage) vehicleFields.mileage = mileage;
+  if (name) vehicleFields.name = name;
+  if (purchaseDate) vehicleFields.purchaseDate = purchaseDate;
+  if (registrationNo) vehicleFields.registrationNo = registrationNo;
+  if (odometer) vehicleFields.odometer = odometer;
   if (make) vehicleFields.make = make;
   if (model) vehicleFields.model = model;
   if (year) vehicleFields.year = year;
@@ -78,7 +94,7 @@ router.put('/:id', auth, async (req, res) => {
     if (!vehicle) return res.status(404).json({ msg: 'Vehicle not found' });
 
     // Check user
-    if (vehicle.user.toString() !== req.userId) {
+    if (vehicle.user.toString() !== req?.body?.userId) {
       return res.status(401).json({ msg: 'Not authorized' });
     }
 
@@ -98,17 +114,17 @@ router.put('/:id', auth, async (req, res) => {
 // @route   DELETE api/vehicles/:id
 // @desc    Delete a vehicle
 // @access  Private
-router.delete('/:id', auth, async (req, res) => {
+router.post('/:id', auth, async (req, res) => {
   try {
     let vehicle = await Vehicle.findById(req.params.id);
     if (!vehicle) return res.status(404).json({ msg: 'Vehicle not found' });
 
     // Check user
-    if (vehicle.user.toString() !== req.userId) {
+    if (vehicle.user.toString() !== req?.body?.userId) {
       return res.status(401).json({ msg: 'Not authorized' });
     }
 
-    await Vehicle.findByIdAndRemove(req.params.id);
+    await Vehicle.findByIdAndDelete(req.params.id);
 
     res.json({ msg: 'Vehicle removed' });
   } catch (err) {
