@@ -8,14 +8,32 @@ import Topbar from '../../components/Topbar';
 
 export default function VehicleList() {
   const dispatch = useDispatch();
+  const searchParams = new URLSearchParams(window.location.search);
+  const vehicleId = searchParams.get('vehicleId');
+
   const { items: vehicles, status } = useSelector(state => state.vehicles);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showVehicleModal, setShowVehicleModal] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchVehicles());
     }
   }, [status, dispatch]);
+
+  useEffect(() => {
+    if (vehicleId) {
+        setShowVehicleModal(true);
+    }
+  }, [vehicleId]);
+
+  const selectedVehicle = vehicles.find(v => v._id === vehicleId);
+
+  const closeVehicleModal = () => {
+    setShowVehicleModal(false);
+    // Remove vehicleId from URL
+    window.history.pushState({}, '', '/vehicles');
+  };
 
   const handleDelete = (id) => {
     setDeleteConfirm(id);
@@ -60,6 +78,97 @@ export default function VehicleList() {
                 </Link>
                 </div>
             </div>
+
+            {/* Vehicle Details Modal */}
+            {showVehicleModal && selectedVehicle && (
+                <div className="vehicle-modal-overlay" onClick={closeVehicleModal}>
+                    <div className="vehicle-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>{selectedVehicle.name}</h2>
+                            <button onClick={closeVehicleModal} className="modal-close">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div className="modal-body">
+                            <div className="modal-section">
+                                <h3>Basic Information</h3>
+                                <div className="modal-grid">
+                                    <div className="modal-field">
+                                        <label>Make</label>
+                                        <span>{selectedVehicle.make}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Model</label>
+                                        <span>{selectedVehicle.model}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Year</label>
+                                        <span>{selectedVehicle.year}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Color</label>
+                                        <span>{selectedVehicle.color}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="modal-section">
+                                <h3>Vehicle Details</h3>
+                                <div className="modal-grid">
+                                    <div className="modal-field">
+                                        <label>VIN</label>
+                                        <span>{selectedVehicle.vin}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Registration No</label>
+                                        <span>{selectedVehicle.registrationNo}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Fuel Type</label>
+                                        <span>{selectedVehicle.fuelType}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Mileage</label>
+                                        <span>{selectedVehicle.mileage || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="modal-section">
+                                <h3>Dates & Documentation</h3>
+                                <div className="modal-grid">
+                                    <div className="modal-field">
+                                        <label>Purchase Date</label>
+                                        <span>{selectedVehicle.purchaseDate ? new Date(selectedVehicle.purchaseDate).toLocaleDateString() : 'N/A'}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Insurance Expiry</label>
+                                        <span>{selectedVehicle.insuranceExpiry ? new Date(selectedVehicle.insuranceExpiry).toLocaleDateString() : 'N/A'}</span>
+                                    </div>
+                                    <div className="modal-field">
+                                        <label>Odometer</label>
+                                        <span>{selectedVehicle.odometer || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <Link to={`/vehicles/edit?vehicleId=${selectedVehicle._id}`} className="btn-edit-modal">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M12 20h9"/>
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                                </svg>
+                                Edit Vehicle
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {vehicles.length === 0 ? (
                 <div className="empty-state">
@@ -178,14 +287,14 @@ export default function VehicleList() {
                         </div>
 
                         <div className="vehicle-card-footer">
-                        <Link to={`/vehicles/${vehicle._id}`} className="btn-view">
+                        <a href={`/vehicles?vehicleId=${vehicle._id}`} className="btn-view">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                             <circle cx="12" cy="12" r="3"/>
                             </svg>
                             View
-                        </Link>
-                        <Link to={`/vehicles/${vehicle._id}/edit`} className="btn-edit">
+                        </a>
+                        <Link to={`/vehicles/edit?vehicleId=${vehicle._id}`} className="btn-edit">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M12 20h9"/>
                             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>

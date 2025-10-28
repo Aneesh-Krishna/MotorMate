@@ -31,7 +31,7 @@ const AppContent = () => {
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/vehicles" element={<PrivateRoute><VehicleList /></PrivateRoute>} />
         <Route path="/vehicles/new" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
-        <Route path="/vehicles/:id/edit" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
+        <Route path="/vehicles/edit" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
         <Route path="/expenses" element={<PrivateRoute><ExpenseList /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>

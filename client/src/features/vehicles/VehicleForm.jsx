@@ -3,11 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addVehicle, updateVehicle, fetchVehicles } from './vehiclesSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import '../../css/VehicleForm.css';
+import Topbar from '../../components/Topbar';
 
 export default function VehicleForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { id } = useParams();
+  // const { id } = useParams();
+  const vehicleId = new URLSearchParams(window.location.search).get('vehicleId');
+  const id = vehicleId;
+
   const { items: vehicles, loading } = useSelector(state => state.vehicles);
 
   const [formData, setFormData] = useState({
@@ -21,7 +25,8 @@ export default function VehicleForm() {
     mileage: '',
     fuelType: 'petrol',
     insuranceExpiry: '',
-    color: ''
+    color: '',
+    odometer: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -42,7 +47,8 @@ export default function VehicleForm() {
           mileage: vehicle.mileage || '',
           fuelType: vehicle.fuelType || 'petrol',
           insuranceExpiry: vehicle.insuranceExpiry || '',
-          color: vehicle.color || ''
+          color: vehicle.color || '',
+          odometer: vehicle.odometer || '',
         });
       }
     } else {
@@ -69,6 +75,11 @@ export default function VehicleForm() {
       case 'mileage':
         if (value && (isNaN(value) || parseFloat(value) < 0)) {
           return 'Mileage must be a positive number';
+        }
+        return '';
+      case 'odometer':
+        if (value && (isNaN(value) || parseFloat(value) < 0)) {
+          return 'Odometer reading must be a positive number';
         }
         return '';
       default:
@@ -111,7 +122,12 @@ export default function VehicleForm() {
     }
 
     if (id) {
-      dispatch(updateVehicle({ id, ...formData }));
+      let payload = {
+        id,
+        ...formData,
+      };
+      
+      dispatch(updateVehicle(payload));
     } else {
       dispatch(addVehicle(formData));
     }
@@ -128,256 +144,259 @@ export default function VehicleForm() {
   ];
 
   return (
-    <div className="vehicle-form-container">
-      <div className="form-header">
-        <div className="form-header-content">
-          <div className="form-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 17h14v2H5v-2zm8-10c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m3.5-3H14V3h-4v1H7.5A2.5 2.5 0 0 0 5 6.5v9A2.5 2.5 0 0 0 7.5 18h9a2.5 2.5 0 0 0 2.5-2.5v-9A2.5 2.5 0 0 0 16.5 4z"/>
-            </svg>
-          </div>
-          <div>
-            <h1 className="form-title">{id ? 'Edit Vehicle' : 'Add New Vehicle'}</h1>
-            <p className="form-subtitle">
-              {id ? 'Update your vehicle information' : 'Fill in the details to add your vehicle'}
-            </p>
+    <>
+      <Topbar />
+      <div className="vehicle-form-container">
+        <div className="form-header">
+          <div className="form-header-content">
+            <div className="form-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 17h14v2H5v-2zm8-10c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m3.5-3H14V3h-4v1H7.5A2.5 2.5 0 0 0 5 6.5v9A2.5 2.5 0 0 0 7.5 18h9a2.5 2.5 0 0 0 2.5-2.5v-9A2.5 2.5 0 0 0 16.5 4z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 className="form-title">{id ? 'Edit Vehicle' : 'Add New Vehicle'}</h1>
+              <p className="form-subtitle">
+                {id ? 'Update your vehicle information' : 'Fill in the details to add your vehicle'}
+              </p>
+            </div>
           </div>
         </div>
+
+        <form onSubmit={handleSubmit} className="vehicle-form">
+          <div className="form-section">
+            <h2 className="section-title">Basic Information</h2>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="name" className="form-label">
+                  Vehicle Name <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`form-input ${errors.name && touched.name ? 'input-error' : ''}`}
+                  placeholder="e.g., My Honda Civic"
+                />
+                {errors.name && touched.name && (
+                  <span className="error-message">{errors.name}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="make" className="form-label">
+                  Make <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="make"
+                  name="make"
+                  value={formData.make}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`form-input ${errors.make && touched.make ? 'input-error' : ''}`}
+                  placeholder="e.g., Honda"
+                />
+                {errors.make && touched.make && (
+                  <span className="error-message">{errors.make}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="model" className="form-label">
+                  Model <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="model"
+                  name="model"
+                  value={formData.model}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`form-input ${errors.model && touched.model ? 'input-error' : ''}`}
+                  placeholder="e.g., Civic"
+                />
+                {errors.model && touched.model && (
+                  <span className="error-message">{errors.model}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="year" className="form-label">
+                  Year <span className="required">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="year"
+                  name="year"
+                  value={formData.year}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`form-input ${errors.year && touched.year ? 'input-error' : ''}`}
+                  placeholder="e.g., 2022"
+                />
+                {errors.year && touched.year && (
+                  <span className="error-message">{errors.year}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="color" className="form-label">
+                  Color
+                </label>
+                <input
+                  type="text"
+                  id="color"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="e.g., Silver"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="fuelType" className="form-label">
+                  Fuel Type
+                </label>
+                <select
+                  id="fuelType"
+                  name="fuelType"
+                  value={formData.fuelType}
+                  onChange={handleChange}
+                  className="form-input"
+                >
+                  {fuelTypes.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2 className="section-title">Vehicle Details</h2>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="vin" className="form-label">
+                  VIN (Vehicle Identification Number)
+                </label>
+                <input
+                  type="text"
+                  id="vin"
+                  name="vin"
+                  value={formData.vin}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="17-character VIN"
+                  maxLength="17"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="registrationNo" className="form-label">
+                  Registration Number
+                </label>
+                <input
+                  type="text"
+                  id="registrationNo"
+                  name="registrationNo"
+                  value={formData.registrationNo}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="e.g., KA01AB1234"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="purchaseDate" className="form-label">
+                  Purchase Date
+                </label>
+                <input
+                  type="date"
+                  id="purchaseDate"
+                  name="purchaseDate"
+                  value={formData.purchaseDate}
+                  onChange={handleChange}
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="odometer" className="form-label">
+                  Current Odometer Reading (km)
+                </label>
+                <input
+                  type="number"
+                  id="odometer"
+                  name="odometer"
+                  value={formData.odometer}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`form-input ${errors.odometer && touched.odometer ? 'input-error' : ''}`}
+                  placeholder="e.g., 25000"
+                  min="0"
+                />
+                {errors.odometer && touched.odometer && (
+                  <span className="error-message">{errors.odometer}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="insuranceExpiry" className="form-label">
+                  Insurance Expiry Date
+                </label>
+                <input
+                  type="date"
+                  id="insuranceExpiry"
+                  name="insuranceExpiry"
+                  value={formData.insuranceExpiry}
+                  onChange={handleChange}
+                  className="form-input"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              onClick={() => navigate('/vehicles')}
+              className="btn-cancel"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn-submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="btn-loading">
+                  <svg className="spinner" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  </svg>
+                  {id ? 'Updating...' : 'Adding...'}
+                </span>
+              ) : (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                  {id ? 'Update Vehicle' : 'Add Vehicle'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={handleSubmit} className="vehicle-form">
-        <div className="form-section">
-          <h2 className="section-title">Basic Information</h2>
-          
-          <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="name" className="form-label">
-                Vehicle Name <span className="required">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`form-input ${errors.name && touched.name ? 'input-error' : ''}`}
-                placeholder="e.g., My Honda Civic"
-              />
-              {errors.name && touched.name && (
-                <span className="error-message">{errors.name}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="make" className="form-label">
-                Make <span className="required">*</span>
-              </label>
-              <input
-                type="text"
-                id="make"
-                name="make"
-                value={formData.make}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`form-input ${errors.make && touched.make ? 'input-error' : ''}`}
-                placeholder="e.g., Honda"
-              />
-              {errors.make && touched.make && (
-                <span className="error-message">{errors.make}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="model" className="form-label">
-                Model <span className="required">*</span>
-              </label>
-              <input
-                type="text"
-                id="model"
-                name="model"
-                value={formData.model}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`form-input ${errors.model && touched.model ? 'input-error' : ''}`}
-                placeholder="e.g., Civic"
-              />
-              {errors.model && touched.model && (
-                <span className="error-message">{errors.model}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="year" className="form-label">
-                Year <span className="required">*</span>
-              </label>
-              <input
-                type="number"
-                id="year"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`form-input ${errors.year && touched.year ? 'input-error' : ''}`}
-                placeholder="e.g., 2022"
-              />
-              {errors.year && touched.year && (
-                <span className="error-message">{errors.year}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="color" className="form-label">
-                Color
-              </label>
-              <input
-                type="text"
-                id="color"
-                name="color"
-                value={formData.color}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="e.g., Silver"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="fuelType" className="form-label">
-                Fuel Type
-              </label>
-              <select
-                id="fuelType"
-                name="fuelType"
-                value={formData.fuelType}
-                onChange={handleChange}
-                className="form-input"
-              >
-                {fuelTypes.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h2 className="section-title">Vehicle Details</h2>
-          
-          <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="vin" className="form-label">
-                VIN (Vehicle Identification Number)
-              </label>
-              <input
-                type="text"
-                id="vin"
-                name="vin"
-                value={formData.vin}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="17-character VIN"
-                maxLength="17"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="registrationNo" className="form-label">
-                Registration Number
-              </label>
-              <input
-                type="text"
-                id="registrationNo"
-                name="registrationNo"
-                value={formData.registrationNo}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="e.g., KA01AB1234"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="purchaseDate" className="form-label">
-                Purchase Date
-              </label>
-              <input
-                type="date"
-                id="purchaseDate"
-                name="purchaseDate"
-                value={formData.purchaseDate}
-                onChange={handleChange}
-                className="form-input"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="mileage" className="form-label">
-                Current Mileage (km)
-              </label>
-              <input
-                type="number"
-                id="mileage"
-                name="mileage"
-                value={formData.mileage}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`form-input ${errors.mileage && touched.mileage ? 'input-error' : ''}`}
-                placeholder="e.g., 25000"
-                min="0"
-              />
-              {errors.mileage && touched.mileage && (
-                <span className="error-message">{errors.mileage}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="insuranceExpiry" className="form-label">
-                Insurance Expiry Date
-              </label>
-              <input
-                type="date"
-                id="insuranceExpiry"
-                name="insuranceExpiry"
-                value={formData.insuranceExpiry}
-                onChange={handleChange}
-                className="form-input"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-actions">
-          <button
-            type="button"
-            onClick={() => navigate('/vehicles')}
-            className="btn-cancel"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="btn-submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="btn-loading">
-                <svg className="spinner" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                </svg>
-                {id ? 'Updating...' : 'Adding...'}
-              </span>
-            ) : (
-              <>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 13l4 4L19 7" />
-                </svg>
-                {id ? 'Update Vehicle' : 'Add Vehicle'}
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+    </>
   );
 }
