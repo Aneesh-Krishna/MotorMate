@@ -27,6 +27,7 @@ export default function VehicleForm() {
     insuranceExpiry: '',
     color: '',
     odometer: '',
+    tankCapacity: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -49,6 +50,7 @@ export default function VehicleForm() {
           insuranceExpiry: vehicle.insuranceExpiry || '',
           color: vehicle.color || '',
           odometer: vehicle.odometer || '',
+          tankCapacity: vehicle.tankCapacity || '',
         });
       }
     } else {
@@ -347,6 +349,27 @@ export default function VehicleForm() {
                 {errors.odometer && touched.odometer && (
                   <span className="error-message">{errors.odometer}</span>
                 )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tankCapacity" className="form-label">
+                  Tank Capacity (litres)
+                </label>
+                <input
+                  type="number"
+                  id="tankCapacity"
+                  name="tankCapacity"
+                  value={formData.tankCapacity}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="form-input"
+                  placeholder="e.g., 45"
+                  step="0.1"
+                  min="0"
+                />
+                <span className="form-hint">
+                  Enter your vehicle's fuel tank capacity for better calculations
+                </span>
               </div>
 
               <div className="form-group">

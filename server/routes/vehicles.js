@@ -8,7 +8,7 @@ const auth = require('../middleware/auth');
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
-    const { color, fuelType, insuranceExpiry, make, mileage, model, name, purchaseDate, registrationNo, year, vin, odometer } = req.body;
+    const { color, fuelType, insuranceExpiry, make, mileage, model, name, purchaseDate, registrationNo, year, vin, odometer, tankCapacity } = req.body;
     const newVehicle = new Vehicle({
       user: req?.body?.user,
       make,
@@ -23,16 +23,17 @@ router.post('/', auth, async (req, res) => {
       fuelType,
       insuranceExpiry,
       odometer,
+      tankCapacity: tankCapacity ? parseFloat(tankCapacity) : null,
     });
     const vehicle = await newVehicle.save();
     res.json(vehicle);
   } catch (err) {
-    console.error(err.message);
+    console.error('❌ Error saving vehicle:', err.message);
     res.status(500).send('Server Error');
   }
 });
 
-// @route   GET api/vehicles/all
+// @route   GET api/vehicles
 // @desc    Get all user vehicles
 // @access  Private
 router.post('/all', auth, async (req, res) => {
@@ -40,7 +41,7 @@ router.post('/all', auth, async (req, res) => {
     const vehicles = await Vehicle.find({ user: req?.body?.userId });
     res.json(vehicles);
   } catch (err) {
-    console.error(err.message);
+    console.error('❌ Error fetching vehicles:', err.message);
     res.status(500).send('Server Error');
   }
 });
@@ -71,8 +72,8 @@ router.get('/:id', auth, async (req, res) => {
 // @route   PUT api/vehicles/:id
 // @desc    Update a vehicle
 // @access  Private
-router.post('/:id', auth, async (req, res) => {
-  const { color, fuelType, insuranceExpiry, make, mileage, model, name, purchaseDate, registrationNo, year, vin, odometer } = req.body;
+router.post('/edit/:id', auth, async (req, res) => {
+  const { color, fuelType, insuranceExpiry, make, mileage, model, name, purchaseDate, registrationNo, year, vin, odometer, tankCapacity } = req.body;
 
   // Build vehicle object
   const vehicleFields = {};
@@ -88,6 +89,7 @@ router.post('/:id', auth, async (req, res) => {
   if (model) vehicleFields.model = model;
   if (year) vehicleFields.year = year;
   if (vin) vehicleFields.vin = vin;
+  if (tankCapacity) vehicleFields.tankCapacity = tankCapacity ? parseFloat(tankCapacity) : null;
 
   try {
     let vehicle = await Vehicle.findById(req.params.id);
@@ -104,9 +106,10 @@ router.post('/:id', auth, async (req, res) => {
       { new: true }
     );
 
+    console.log('✅ Vehicle updated successfully:', vehicle);
     res.json(vehicle);
   } catch (err) {
-    console.error(err.message);
+    console.error('❌ Error updating vehicle:', err.message);
     res.status(500).send('Server Error');
   }
 });
@@ -114,7 +117,7 @@ router.post('/:id', auth, async (req, res) => {
 // @route   DELETE api/vehicles/:id
 // @desc    Delete a vehicle
 // @access  Private
-router.post('/:id', auth, async (req, res) => {
+router.post('/delete/:id', auth, async (req, res) => {
   try {
     let vehicle = await Vehicle.findById(req.params.id);
     if (!vehicle) return res.status(404).json({ msg: 'Vehicle not found' });

@@ -32,7 +32,7 @@ export const updateVehicle = createAsyncThunk('vehicles/update', async (actionPa
   //   userId: user?.id || user?._id || '',
   //   ...formData,
   // };
-  const res = await api.post(`/vehicles/${actionPayload?.id}`, toSendData);
+  const res = await api.post(`/vehicles/edit/${actionPayload?.id}`, toSendData);
   return res.id;
 });
 
@@ -41,7 +41,7 @@ export const deleteVehicle = createAsyncThunk('vehicles/delete', async (id) => {
   const payload = {
     userId: user?.id || user?._id || '',
   };
-  await api.post(`/vehicles/${id}`, payload);
+  await api.post(`/vehicles/delete/${id}`, payload);
   return id;
 });
 
