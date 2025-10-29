@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import VehicleForm from './features/vehicles/VehicleForm';
 import VehicleList from './features/vehicles/VehicleList';
 import ExpenseList from './features/expenses/ExpenseList';
+import ExpenseForm from './features/expenses/ExpenseForm';
 import { setUser } from './features/auth/authSlice';
 
 const AppContent = () => {
@@ -33,6 +34,8 @@ const AppContent = () => {
         <Route path="/vehicles/new" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
         <Route path="/vehicles/edit" element={<PrivateRoute><VehicleForm /></PrivateRoute>} />
         <Route path="/expenses" element={<PrivateRoute><ExpenseList /></PrivateRoute>} />
+        <Route path="/expenses/new" element={<PrivateRoute><ExpenseForm /></PrivateRoute>} />
+        <Route path="/expenses/:id" element={<PrivateRoute><ExpenseForm /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   );

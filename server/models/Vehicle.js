@@ -12,6 +12,8 @@ const vehicleSchema = new mongoose.Schema({
   color: { type: String  },
   fuelType: { type: String },
   insuranceExpiry: { type: String },
-  odometer: Number // optional
+  odometer: Number, // optional
+  tankCapacity: { type: Number, default: null }, // Tank capacity in litres
+  isActive: { type: Boolean, default: true } // Vehicle active status
 });
 module.exports = mongoose.model('Vehicle', vehicleSchema);
